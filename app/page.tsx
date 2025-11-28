@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -10,10 +10,22 @@ import { getCurrentUser, logoutUser } from "@/lib/auth"
 
 export default function Home() {
   const router = useRouter()
-  const user = getCurrentUser()
+  const [user, setUser] = useState<ReturnType<typeof getCurrentUser> | null>(null)
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+    const currentUser = getCurrentUser()
+    setUser(currentUser)
+
+    if (currentUser) {
+      router.push("/dashboard")
+    }
+  }, [router])
 
   const handleLogout = () => {
     logoutUser()
+    setUser(null)
     router.refresh()
   }
 
@@ -36,12 +48,6 @@ export default function Home() {
       transition: { duration: 0.5 },
     },
   }
-
-  useEffect(() => {
-    if (user) {
-      router.push("/dashboard")
-    }
-  }, [user, router])
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-background via-background to-card">

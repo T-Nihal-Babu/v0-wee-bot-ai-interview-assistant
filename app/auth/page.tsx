@@ -7,21 +7,25 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { motion } from "framer-motion"
 import { registerUser, loginUser } from "@/lib/auth"
-import { Brain } from "lucide-react"
+import { Brain, Briefcase } from "lucide-react"
 
 type AuthMode = "login" | "signup"
+type UserType = "candidate" | "company"
 
 export default function AuthPage() {
   const router = useRouter()
   const [mode, setMode] = useState<AuthMode>("login")
+  const [userType, setUserType] = useState<UserType>("candidate")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [formData, setFormData] = useState({
     username: "",
     email: "",
     password: "",
+    company: "",
   })
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,7 +43,13 @@ export default function AuthPage() {
 
     try {
       if (mode === "signup") {
-        const result = registerUser(formData.username, formData.email, formData.password)
+        const result = registerUser(
+          formData.username,
+          formData.email,
+          formData.password,
+          userType,
+          userType === "company" ? formData.company : undefined,
+        )
         if (!result.success) {
           setError(result.error || "Signup failed")
           setLoading(false)
@@ -82,12 +92,25 @@ export default function AuthPage() {
             <CardHeader>
               <CardTitle>{mode === "login" ? "Welcome Back" : "Create Account"}</CardTitle>
               <CardDescription>
-                {mode === "login"
-                  ? "Sign in to continue your interview prep"
-                  : "Start your journey to acing interviews"}
+                {mode === "login" ? "Sign in to continue your interview prep" : "Choose your role to get started"}
               </CardDescription>
             </CardHeader>
             <CardContent>
+              {mode === "signup" && (
+                <Tabs value={userType} onValueChange={(value: any) => setUserType(value)} className="mb-6">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="candidate" className="flex items-center gap-2">
+                      <Brain className="w-4 h-4" />
+                      Practice
+                    </TabsTrigger>
+                    <TabsTrigger value="company" className="flex items-center gap-2">
+                      <Briefcase className="w-4 h-4" />
+                      Hiring
+                    </TabsTrigger>
+                  </TabsList>
+                </Tabs>
+              )}
+
               <form onSubmit={handleSubmit} className="space-y-4">
                 {mode === "signup" && (
                   <div>
@@ -128,6 +151,20 @@ export default function AuthPage() {
                     className="bg-input border-border"
                   />
                 </div>
+
+                {mode === "signup" && userType === "company" && (
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Company Name</label>
+                    <Input
+                      name="company"
+                      placeholder="Enter your company name"
+                      value={formData.company}
+                      onChange={handleChange}
+                      required
+                      className="bg-input border-border"
+                    />
+                  </div>
+                )}
 
                 {error && <div className="text-sm text-destructive bg-destructive/10 p-3 rounded">{error}</div>}
 
