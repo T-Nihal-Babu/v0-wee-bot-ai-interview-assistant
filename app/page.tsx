@@ -1,11 +1,22 @@
 "use client"
 
+import { useEffect } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
 import { Brain, Code2, ArrowRight, TrendingUp } from "lucide-react"
+import { getCurrentUser, logoutUser } from "@/lib/auth"
 
 export default function Home() {
+  const router = useRouter()
+  const user = getCurrentUser()
+
+  const handleLogout = () => {
+    logoutUser()
+    router.refresh()
+  }
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -26,6 +37,12 @@ export default function Home() {
     },
   }
 
+  useEffect(() => {
+    if (user) {
+      router.push("/dashboard")
+    }
+  }, [user, router])
+
   return (
     <main className="min-h-screen bg-gradient-to-b from-background via-background to-card">
       {/* Navigation Bar */}
@@ -34,12 +51,16 @@ export default function Home() {
           <div className="text-2xl font-bold bg-gradient-to-r from-accent via-primary to-accent bg-clip-text text-transparent">
             WeeBot
           </div>
-          <Link href="/progress">
-            <Button variant="secondary" size="sm">
-              <TrendingUp className="w-4 h-4 mr-2" />
-              View Progress
-            </Button>
-          </Link>
+          <div className="flex items-center gap-4">
+            {user && <span className="text-sm text-muted-foreground">Welcome, {user.username}</span>}
+            {!user && (
+              <Link href="/auth">
+                <Button variant="secondary" size="sm">
+                  Sign In
+                </Button>
+              </Link>
+            )}
+          </div>
         </div>
       </nav>
 
@@ -126,9 +147,19 @@ export default function Home() {
         <motion.div className="text-center" variants={itemVariants} initial="hidden" animate="visible">
           <p className="text-sm text-muted-foreground mb-4">Ready to ace your next interview?</p>
           <div className="flex gap-4 justify-center">
-            <Link href="/communication">
-              <Button className="bg-accent hover:bg-accent/90 text-accent-foreground px-8">Get Started</Button>
+            <Link href={user ? "/dashboard" : "/auth"}>
+              <Button className="bg-accent hover:bg-accent/90 text-accent-foreground px-8">
+                {user ? "Go to Dashboard" : "Get Started"}
+              </Button>
             </Link>
+            {user && (
+              <Link href="/progress">
+                <Button variant="secondary" size="lg">
+                  <TrendingUp className="w-4 h-4 mr-2" />
+                  View Progress
+                </Button>
+              </Link>
+            )}
           </div>
         </motion.div>
       </div>

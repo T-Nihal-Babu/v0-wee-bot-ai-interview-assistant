@@ -7,13 +7,14 @@ import { ProgressStats } from "@/components/progress-stats"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { getSessions, getStats } from "@/lib/storage"
 import type { Session } from "@/lib/storage"
+import { ImprovementsSection } from "@/components/improvisations-section"
+import EnhancedProgressDashboard from "@/components/enhanced-progress-dashboard"
 
 export default function ProgressPage() {
   const [sessions, setSessions] = useState<Session[]>([])
   const [activeTab, setActiveTab] = useState("all")
 
   useEffect(() => {
-    // Reload sessions when tab changes or component mounts
     const allSessions = getSessions()
     setSessions(allSessions)
   }, [])
@@ -33,6 +34,12 @@ export default function ProgressPage() {
       <Header title="Progress Tracking" description="View all your assessment sessions and performance metrics" />
       <main className="container mx-auto px-4 py-8">
         <div className="space-y-8">
+          {/* Enhanced Progress Dashboard with 5 Key Metrics */}
+          <div>
+            <h2 className="text-2xl font-bold mb-4">Performance Analytics</h2>
+            <EnhancedProgressDashboard />
+          </div>
+
           {/* Overall Stats */}
           <ProgressStats
             title="Overall Performance"
@@ -67,6 +74,12 @@ export default function ProgressPage() {
               />
             )}
           </div>
+
+          {/* Improvisations Section */}
+          <ImprovementsSection
+            communicationSessions={communicationSessions as any}
+            codingSessions={codingSessions as any}
+          />
 
           {/* Sessions List */}
           <div>

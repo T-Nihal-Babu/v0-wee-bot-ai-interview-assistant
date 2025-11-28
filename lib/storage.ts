@@ -8,6 +8,15 @@ export interface CommunicationSession {
   questionsAnswered: number
   score?: number
   recordings?: Blob
+  level?: "beginner" | "intermediate" | "advanced"
+  jobRole?: string
+  metrics?: {
+    communicationSkills: number
+    vocabulary: number
+    confidence: number
+    bodyLanguage: number
+    clarity: number
+  }
 }
 
 export interface CodingSession {
@@ -19,6 +28,14 @@ export interface CodingSession {
   totalProblems: number
   accuracy: number
   score: number
+  language?: string
+  difficulty?: "easy" | "medium" | "hard"
+  metrics?: {
+    codeQuality: number
+    efficiency: number
+    readability: number
+    problemSolving: number
+  }
 }
 
 export type Session = CommunicationSession | CodingSession

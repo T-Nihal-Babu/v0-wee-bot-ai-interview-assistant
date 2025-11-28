@@ -52,3 +52,89 @@ export async function analyzeResponse(
     throw error
   }
 }
+
+export async function analyzeCommunicationMetrics(transcript: string): Promise<{
+  communicationSkills: number
+  vocabulary: number
+  confidence: number
+  bodyLanguage: number
+  clarity: number
+}> {
+  try {
+    const response = await fetch("/api/analyze-communication", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ transcript }),
+    })
+
+    if (!response.ok) throw new Error("Failed to analyze metrics")
+
+    const data = await response.json()
+    return data.metrics
+  } catch (error) {
+    console.error("Error analyzing communication metrics:", error)
+    throw error
+  }
+}
+
+export async function analyzeCode(
+  code: string,
+  language: string,
+  problemDescription: string,
+): Promise<{
+  codeQuality: number
+  efficiency: number
+  readability: number
+  suggestions: string[]
+  optimizations: string[]
+}> {
+  try {
+    const response = await fetch("/api/analyze-code", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        code,
+        language,
+        problemDescription,
+      }),
+    })
+
+    if (!response.ok) throw new Error("Failed to analyze code")
+
+    const data = await response.json()
+    return data.analysis
+  } catch (error) {
+    console.error("Error analyzing code:", error)
+    throw error
+  }
+}
+
+export async function generateImprovementTips(
+  category: "communication" | "coding",
+  skillLevel: string,
+): Promise<string[]> {
+  try {
+    const response = await fetch("/api/generate-tips", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        category,
+        skillLevel,
+      }),
+    })
+
+    if (!response.ok) throw new Error("Failed to generate tips")
+
+    const data = await response.json()
+    return data.tips
+  } catch (error) {
+    console.error("Error generating tips:", error)
+    throw error
+  }
+}
